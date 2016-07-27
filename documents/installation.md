@@ -1,6 +1,7 @@
 # Installation
 
 The client is implemented as a Windows service. The service uses the SysInternals [Autoruns](https://technet.microsoft.com/en-gb/sysinternals/bb963902.aspx) tool to extract the autorun data. The Autoruns tool is provided in two forms, GUI and console.
+
 The console version of the Autoruns tool (autorunsc.exe) must be downloaded separately and put into the same directory as the rest of the AutoRuns client files.
 
 The service uses the configuration details within the **AutoRunLogger.xml** file. The file contains two settings:
