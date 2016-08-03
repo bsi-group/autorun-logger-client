@@ -12,7 +12,7 @@ namespace AutoRunLogger
     /// <summary>
     /// 
     /// </summary>
-    public partial class ArlService : ServiceBase
+    public partial class AutoRunLogger : ServiceBase
     {
         #region Constants 
         private const string AUTORUNS_PARAMETERS = "-accepteula -a * -x -h -s -t *";
@@ -30,7 +30,7 @@ namespace AutoRunLogger
         /// <summary>
         /// 
         /// </summary>
-        public ArlService()
+        public AutoRunLogger()
         {
             InitializeComponent();
 
@@ -39,8 +39,8 @@ namespace AutoRunLogger
             this.ehc = new ExtendedHttpClient();
             this.ehc.Error += OnEhc_Error;
             this.timer = new System.Timers.Timer();
-            //this.timer.Interval = TimeSpan.FromDays(1).TotalMilliseconds;
-            this.timer.Interval = 120000;
+            this.timer.Interval = TimeSpan.FromDays(1).TotalMilliseconds;
+            //this.timer.Interval = 120000;
             this.timer.Elapsed += Timer_Elapsed;
         }
         #endregion
@@ -63,21 +63,21 @@ namespace AutoRunLogger
             {
                 EventLog.WriteEntry(Global.DISPLAY_NAME, "Autorunsc does not exist in the application directory: " + this.autorunsPath, EventLogEntryType.Error);
                 this.ExitCode = -1;
-                this.Stop();
+                Program.StopService();
                 return;
             }
 
             if (ValidateConfig() == false)
             {
                 this.ExitCode = -1;
-                this.Stop();
+                Program.StopService();
                 return;
             }
 
             if (LoadX509Certificate() == false)
             {
                 this.ExitCode = -1;
-                this.Stop();
+                Program.StopService();
                 return;
             }
 

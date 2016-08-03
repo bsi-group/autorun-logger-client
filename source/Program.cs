@@ -17,7 +17,7 @@ namespace AutoRunLogger
                 ServiceBase[] ServicesToRun;
                 ServicesToRun = new ServiceBase[]
                 {
-                new ArlService()
+                new AutoRunLogger()
                 };
                 ServiceBase.Run(ServicesToRun);
             }
@@ -139,7 +139,7 @@ namespace AutoRunLogger
         /// <returns></returns>
         private static AssemblyInstaller GetInstaller()
         {
-            AssemblyInstaller installer = new AssemblyInstaller(typeof(ArlService).Assembly, null);
+            AssemblyInstaller installer = new AssemblyInstaller(typeof(AutoRunLogger).Assembly, null);
             installer.UseNewContext = true;
             return installer;
         }
@@ -172,7 +172,7 @@ namespace AutoRunLogger
         /// <summary>
         /// 
         /// </summary>
-        private static void StopService()
+        internal static void StopService()
         {
             if (!IsInstalled()) return;
             using (ServiceController controller = new ServiceController(Global.SERVICE_NAME))

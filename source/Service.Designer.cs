@@ -1,6 +1,6 @@
 ﻿namespace AutoRunLogger
 {
-    partial class ArlService
+    partial class AutoRunLogger
     {
         /// <summary> 
         /// Required designer variable.
@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             // 
-            // ArlService
+            // AutoRunLogger
             // 
-            this.ServiceName = "ArlService";
+            this.ServiceName = "AutoRunLogger";
 
         }
 

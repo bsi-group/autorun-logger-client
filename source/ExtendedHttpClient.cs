@@ -75,39 +75,17 @@ namespace AutoRunLogger
                         }               
                     }                       
                 }
-
-                //using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
-                //{
-                //    using (System.IO.Compression.GZipStream gzip = new System.IO.Compression.GZipStream(ms,
-                //        System.IO.Compression.CompressionMode.Compress, true))
-                //    {
-                //        gzip.Write(data, 0, data.Length);
-                //    }
-
-                //    ms.Position = 0;
-                //    byte[] compressed = new byte[ms.Length];
-                //    ms.Read(compressed, 0, compressed.Length);
-
-                //    MemoryStream outStream = new MemoryStream(compressed);
-
-                //    StreamContent streamContent = new StreamContent(outStream);
-                //    streamContent.Headers.Add("Content-Encoding", "gzip");
-                //    streamContent.Headers.ContentLength = outStream.Length;
-
-                //    Uri target = new Uri(url);
-                //    HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, target);
-                //    requestMessage.Content = streamContent;
-
-                //    var client = new HttpClient();
-                //    HttpResponseMessage response = await client.SendAsync(requestMessage);
-                //    var ret = await response.Content.ReadAsStringAsync();
-                //}
-
-
             }
             catch (Exception ex)
             {
-                OnError("Error sending AutoRun data: " + ex.Message);
+                if (ex.InnerException != null)
+                {
+                    OnError("Error sending AutoRun data: " + ex.InnerException.Message);
+                }
+                else
+                {
+                    OnError("Error sending AutoRun data: " + ex.Message);
+                }                
             }
         }
 
