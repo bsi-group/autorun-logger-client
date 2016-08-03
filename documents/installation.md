@@ -21,6 +21,10 @@ autorunsc.exe
 ```
 Once the files have been copied to the host, the file permissions should be modified to prevent other users from modifying the files, in particular the **autorunsc** binary as this is executed by the service, which has **SYSTEM** permissions.
 
+## Autorunsc
+
+This version has been tested with **Autoruns v13.62**. Ensure that this version only is used.
+
 ## Service
 
 The **AutoRunLogger.exe** has automatic Windows service installation code which means that the use of **sc.exe** or **InstallUtil.exe** is not required.
