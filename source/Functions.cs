@@ -1,13 +1,27 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace AutoRunLogger
 {
+    
+
     /// <summary>
     /// 
     /// </summary>
-    internal class Functions
+    internal static class Functions
     {
+        public static Exception GetInnerMostException(this Exception e)
+        {
+            if (e == null)
+                return null;
+
+            while (e.InnerException != null)
+                e = e.InnerException;
+
+            return e;
+        }
+
         /// <summary>
         /// Executes a process including specifying the working directory
         /// </summary>

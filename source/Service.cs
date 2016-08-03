@@ -52,6 +52,9 @@ namespace AutoRunLogger
         /// <param name="args"></param>
         protected override void OnStart(string[] args)
         {
+            // To debug, load VS2015 as an admin user, and then uncomment the following line
+            //Debugger.Launch();
+
             if (EventLog.SourceExists(Global.DISPLAY_NAME) == false)
             {
                 EventLog.CreateEventSource(Global.DISPLAY_NAME, "Application");
@@ -84,8 +87,6 @@ namespace AutoRunLogger
             this.remoteUrl = "https://" + config.RemoteServer + "/" + Environment.UserDomainName + "/" + Environment.MachineName;
             this.timer.Enabled = true;
 
-            // Get an initial set of data using a Task so the service OnStart 
-            // method can complete without waiting for the process to finish            
             Task.Run(() => { ProcessAutorunData(); });
         }
 
@@ -144,10 +145,11 @@ namespace AutoRunLogger
 
             Process p = new Process();
             ProcessResult pr = Functions.ExecuteProcess(p, autorunsPath, AUTORUNS_PARAMETERS, "");
-            var temp = Encoding.UTF8.GetBytes(pr.Output);
-            string output = Encoding.Unicode.GetString(temp);
 
-            Task.Run(() => { ehc.Send(remoteUrl, Encoding.ASCII.GetBytes(output)); });
+            //var temp = Encoding.UTF8.GetBytes(pr.Output);
+            //string output = Encoding.Unicode.GetString(temp);
+
+            Task.Run(() => { ehc.Send(remoteUrl, Encoding.ASCII.GetBytes(pr.Output)); });
         }
 
         /// <summary>

@@ -78,14 +78,15 @@ namespace AutoRunLogger
             }
             catch (Exception ex)
             {
-                if (ex.InnerException != null)
+                var e = ex.GetInnerMostException();
+                if (e != null)
                 {
-                    OnError("Error sending AutoRun data: " + ex.InnerException.Message);
-                }
+                    OnError("Error sending AutoRun data: " + e.Message);
+                } 
                 else
                 {
                     OnError("Error sending AutoRun data: " + ex.Message);
-                }                
+                }             
             }
         }
 
