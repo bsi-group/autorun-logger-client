@@ -52,6 +52,24 @@ namespace AutoRunLogger
         /// <param name="args"></param>
         protected override void OnStart(string[] args)
         {
+            StartService();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected override void OnStop()
+        {
+            EventLog.WriteEntry(Global.DISPLAY_NAME, "Service stopping", EventLogEntryType.Information);
+            this.timer.Enabled = false;            
+        }
+
+        /// <summary>
+        /// Method to start service functions. This provides a public interface so 
+        /// that the functionality can be run without initialising a service e.g. debug
+        /// </summary>
+        public void StartService()
+        {
             // To debug, load VS2015 as an admin user, and then uncomment the following line
             //Debugger.Launch();
 
@@ -88,15 +106,6 @@ namespace AutoRunLogger
             this.timer.Enabled = true;
 
             Task.Run(() => { ProcessAutorunData(); });
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        protected override void OnStop()
-        {
-            EventLog.WriteEntry(Global.DISPLAY_NAME, "Service stopping", EventLogEntryType.Information);
-            this.timer.Enabled = false;            
         }
         #endregion
 
@@ -138,8 +147,7 @@ namespace AutoRunLogger
         private void ProcessAutorunData()
         {
             if (IsValidAutoRunsBinary() == false)
-            {
-                EventLog.WriteEntry(Global.DISPLAY_NAME, "Autorun binary is invalid", EventLogEntryType.Error);
+            {               
                 return;
             }
 
@@ -158,28 +166,53 @@ namespace AutoRunLogger
         /// <returns></returns>
         private bool IsValidAutoRunsBinary()
         {
-            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(this.autorunsPath);
-            if (fvi.InternalName.ToLower() != "sysinternals autoruns")
+            try
             {
-                return false;
-            }
+                FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(this.autorunsPath);
+                if (fvi.InternalName.ToLower() != "sysinternals autoruns")
+                {
+                    EventLog.WriteEntry(Global.DISPLAY_NAME, "Error validating Autorun binary: Invalid internal name (" + fvi.InternalName + ")", EventLogEntryType.Error);
+                    return false;
+                }
 
-            var cert = X509Certificate.CreateFromSignedFile(this.autorunsPath);
-            var cert2 = new X509Certificate2(cert.Handle);
-            if (cert2.Verify() == false)
-            {
-                return false;
-            }
+                var cert = X509Certificate.CreateFromSignedFile(this.autorunsPath);
+                if (cert == null)
+                {
+                    EventLog.WriteEntry(Global.DISPLAY_NAME, "Error validating Autorun binary: Unable to check certificate from signed file", EventLogEntryType.Error);
+                    return false;
+                }
 
-            if (cert2.Issuer.ToLower() != "cn=microsoft code signing pca, o=microsoft corporation, l=redmond, s=washington, c=us")
-            {
-                return false;
-            }
+                var cert2 = new X509Certificate2(cert.Handle);
+                if (cert2 == null)
+                {
+                    EventLog.WriteEntry(Global.DISPLAY_NAME, "Error validating Autorun binary: Unable to create X509Certificate2 object", EventLogEntryType.Error);
+                    return false;
+                }
 
-            if (AuthenticodeTools.IsTrusted(this.autorunsPath) == false)
-            {
-                return false;
+                // This method appears to be unreliable and therefore has been commented out
+                //if (cert2.Verify() == false)
+                //{
+                //    EventLog.WriteEntry(Global.DISPLAY_NAME, "Error validating Autorun binary: Unable to verify file signature", EventLogEntryType.Error);
+                //    return false;
+                //}
+
+                if (cert2.Issuer.ToLower() != "cn=microsoft code signing pca, o=microsoft corporation, l=redmond, s=washington, c=us")
+                {
+                    EventLog.WriteEntry(Global.DISPLAY_NAME, "Error validating Autorun binary: Invalid issuer (" + cert2.Issuer + ")", EventLogEntryType.Error);
+                    return false;
+                }
+
+                if (AuthenticodeTools.IsTrusted(this.autorunsPath) == false)
+                {
+                    EventLog.WriteEntry(Global.DISPLAY_NAME, "Error validating Autorun binary: Untrusted binary", EventLogEntryType.Error);
+                    return false;
+                }
             }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry(Global.DISPLAY_NAME, "Error validating Autorun binary: " + ex.Message, EventLogEntryType.Error);
+                return false;
+            }            
 
             return true;
         }

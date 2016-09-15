@@ -33,6 +33,10 @@ namespace AutoRunLogger
                         StopService();
                         UninstallService();
                         break;
+                    case "-run":
+                        var s = new AutoRunLogger();
+                        s.StartService();
+                        break;
                     default:
                         throw new NotImplementedException();
                 }
